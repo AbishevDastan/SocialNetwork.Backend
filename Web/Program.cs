@@ -1,6 +1,8 @@
 using Application.AuthenticationHandlers.HashManager;
 using Application.AuthenticationHandlers.JwtManager;
 using Application.Extensions;
+using Application.Extensions.UserContext;
+using Application.Services.PostService;
 using Application.Services.UserService;
 using Domain.Abstractions;
 using Infrastructure;
@@ -48,11 +50,17 @@ builder.Services.AddAuthorization(options => options.DefaultPolicy =
 
 // Repositories
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IPostRepository, PostRepository>();
 
 // Services
+builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IJwtManager, JwtManager>();
 builder.Services.AddTransient<IHashManager, HashManager>();
+builder.Services.AddTransient<IUserContextService, UserContextService>();
+
+// HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -107,6 +115,8 @@ app.UseCors("Social Network");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseAuthentication();
 
 app.MapControllers();
 

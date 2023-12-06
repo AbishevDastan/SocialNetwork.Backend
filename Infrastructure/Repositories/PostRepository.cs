@@ -13,19 +13,26 @@ namespace Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Post> AddPost(Post post)
+        public async Task<Post> AddPost(Post post, int currentUserId)
         {
-            await _dbContext.Posts.AddAsync(post);
+            var newPost = new Post
+            {
+                Content = post.Content,
+                UserId = currentUserId,
+                CreationDate = DateTimeOffset.UtcNow
+            };
+
+            await _dbContext.Posts.AddAsync(newPost);
             await _dbContext.SaveChangesAsync();
 
-            return post;
+            return newPost;
         }
 
         public async Task<bool> DeletePost(int id)
         {
-            var post = GetPost(id);
+            var post = await GetPost(id);
 
-            _dbContext.Remove(post);
+            _dbContext.Posts.Remove(post);
             await _dbContext.SaveChangesAsync();
 
             return true;
@@ -52,7 +59,6 @@ namespace Infrastructure.Repositories
                 dbPost.Content = post.Content;
                 dbPost.CreationDate = post.CreationDate;
                 dbPost.UpdateDate = post.UpdateDate;
-                dbPost.UserId = post.UserId;
 
                 await _dbContext.SaveChangesAsync();
 
@@ -62,4 +68,4 @@ namespace Infrastructure.Repositories
         }
     }
 }
-}
+

@@ -15,9 +15,9 @@ namespace Infrastructure.Configurations
             builder.Property(p => p.CreationDate);
             builder.Property(p => p.UpdateDate);
 
-            builder.HasOne(x => x.User)
-                .WithMany()
-                .HasForeignKey(x => x.UserId);
+            builder.HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId);
 
             builder.ToTable("Posts");
         }
