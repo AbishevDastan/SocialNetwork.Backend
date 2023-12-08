@@ -58,8 +58,12 @@ namespace Application.Services.UserService
 
             if (!await _userRepository.AreUsersFollowingEachOther(followerId, followingId))
             {
-                await _userRepository.FollowUser(followerId, followingId);  
-                return true;
+                if (followerId != followingId)
+                {
+                    await _userRepository.FollowUser(followerId, followingId);
+                    return true;
+                }
+                throw new Exception("You can not follow yourself.");
             }
             throw new Exception("You are already following this user.");
         }
@@ -70,8 +74,12 @@ namespace Application.Services.UserService
 
             if (await _userRepository.AreUsersFollowingEachOther(followerId, followingId))
             {
-                await _userRepository.UnfollowUser(followerId, followingId);
-                return true;
+                if (followerId != followingId)
+                {
+                    await _userRepository.UnfollowUser(followerId, followingId);
+                    return true;
+                }
+                throw new Exception("You can not unfollow yourself.");
             }
             throw new Exception("You can not unfollow the user, who is not followed by you.");
         }

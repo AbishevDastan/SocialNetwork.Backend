@@ -44,7 +44,7 @@ namespace Web.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{followingId}/unfollow")]
+        [HttpDelete("{followingId}/unfollow")]
         [Authorize]
         public async Task<ActionResult> UnfollowUser(int followingId)
         {
