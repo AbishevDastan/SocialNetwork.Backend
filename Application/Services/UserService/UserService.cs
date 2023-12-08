@@ -1,5 +1,7 @@
 ﻿using Application.AuthenticationHandlers.HashManager;
 using Application.AuthenticationHandlers.JwtManager;
+using Application.Extensions.UserContext;
+using Application.UseCases.Follow;
 using Application.UseCases.User;
 using Domain.Abstractions;
 using Domain.Entities;
@@ -11,12 +13,14 @@ namespace Application.Services.UserService
         private readonly IUserRepository _userRepository;
         private readonly IHashManager _hashManager;
         private readonly IJwtManager _jwtManager;
+        private readonly IUserContextService _userContextService;
 
-        public UserService(IUserRepository userRepository, IHashManager hashManager, IJwtManager jwtManager)
+        public UserService(IUserRepository userRepository, IHashManager hashManager, IJwtManager jwtManager, IUserContextService userContextService)
         {
             _userRepository = userRepository;
             _hashManager = hashManager;
             _jwtManager = jwtManager;
+            _userContextService = userContextService;
         }
 
         public async Task<int> Register(User user, string password)
@@ -46,6 +50,30 @@ namespace Application.Services.UserService
                     ExpiresAt = DateTimeOffset.UtcNow.AddHours(12)
                 };
             }
+        }
+
+        public async Task<bool> FollowUser(int followerId, int followingId)
+        {
+            followerId = _userContextService.GetCurrentUserId();
+
+            if (!await _userRepository.AreUsersFollowingEachOther(followerId, followingId))
+            {
+                await _userRepository.FollowUser(followerId, followingId);  
+                return true;
+            }
+            throw new Exception("You are already following this user.");
+        }
+
+        public async Task<bool> UnfollowUser(int followerId, int followingId)
+        {
+            followerId = _userContextService.GetCurrentUserId();
+
+            if (await _userRepository.AreUsersFollowingEachOther(followerId, followingId))
+            {
+                await _userRepository.UnfollowUser(followerId, followingId);
+                return true;
+            }
+            throw new Exception("You can not unfollow the user, who is not followed by you.");
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Infrastructure.Configurations
 
             builder.Property(p => p.Content);
             builder.Property(p => p.CreationDate);
-            builder.Property(p => p.UpdateDate);
 
             builder.HasOne(p => p.User)
                 .WithMany(u => u.Posts)

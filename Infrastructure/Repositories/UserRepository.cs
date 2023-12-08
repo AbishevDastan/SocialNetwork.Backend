@@ -28,6 +28,7 @@ namespace Infrastructure.Repositories
 
             return user;
         }
+
         public async Task<int> Register(User user, string password)
         {
             _hashManager.CreateHash(password, out byte[] hash, out byte[] salt);
@@ -37,6 +38,42 @@ namespace Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
 
             return user.Id;
+        }
+
+        public async Task FollowUser(int followerId, int followingId)
+        {
+            var follow = new Follow
+            {
+                FollowerId = followerId,
+                FollowingId = followingId,
+                FollowDate = DateTime.Now
+            };
+
+            _dbContext.Follows.Add(follow);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UnfollowUser(int followerId, int followingId)
+        {
+            var follow = await GetFollow(followerId, followingId);
+
+            if (follow != null)
+            {
+                _dbContext.Follows.Remove(follow);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> AreUsersFollowingEachOther(int followerId, int followingId)
+        {
+            return await _dbContext.Follows
+                .AnyAsync(f => f.FollowerId == followerId && f.FollowingId == followingId);
+        }
+
+        public async Task<Follow> GetFollow(int followerId, int followingId)
+        {
+            return await _dbContext.Follows
+                .FirstOrDefaultAsync(f => f.FollowerId == followerId && f.FollowingId == followingId);
         }
     }
 }

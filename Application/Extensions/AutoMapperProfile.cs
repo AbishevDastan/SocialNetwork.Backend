@@ -1,4 +1,5 @@
-﻿using Application.UseCases.Post;
+﻿using Application.UseCases.Follow;
+using Application.UseCases.Post;
 using Application.UseCases.User;
 using AutoMapper;
 using Domain.Entities;
@@ -26,6 +27,9 @@ namespace Application.Extensions
             CreateMap<UpdatePostDto, Post>();
             CreateMap<PostDto, UpdatePostDto>();
             CreateMap<UpdatePostDto, PostDto>();
+
+            CreateMap<Follow, FollowDto>();
+            CreateMap<FollowDto, Follow>();
         }
     }
 }
