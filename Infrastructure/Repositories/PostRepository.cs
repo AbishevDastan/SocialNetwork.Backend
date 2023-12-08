@@ -47,6 +47,7 @@ namespace Infrastructure.Repositories
         public async Task<List<Post>> GetPosts()
         {
             return await _dbContext.Posts
+                .OrderByDescending(p => p.CreationDate)
                 .ToListAsync();
         }
 
@@ -58,7 +59,6 @@ namespace Infrastructure.Repositories
             {
                 dbPost.Content = post.Content;
                 dbPost.CreationDate = post.CreationDate;
-                dbPost.UpdateDate = post.UpdateDate;
 
                 await _dbContext.SaveChangesAsync();
 

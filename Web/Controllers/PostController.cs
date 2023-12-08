@@ -62,7 +62,7 @@ namespace Web.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize]
         public async Task<ActionResult<PostDto>> UpdatePost(UpdatePostDto updatePostDto, int id)
         {
