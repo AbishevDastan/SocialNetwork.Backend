@@ -16,6 +16,11 @@ namespace Infrastructure.Repositories
             _hashManager = hashManager;
         }
 
+        public async Task<List<User>> GetUsers()
+        {
+            return await _dbContext.Users.ToListAsync();
+        }
+
         public async Task<User> GetUserByEmail(string email)
         {
             var user = await _dbContext.Users
@@ -29,11 +34,24 @@ namespace Infrastructure.Repositories
             return user;
         }
 
+        public async Task<List<User>> SearchUsers(string searchText)
+        {
+            searchText = searchText.ToLower(); 
+
+            return await _dbContext.Users
+                .Where(u => u.Email.ToLower().Contains(searchText) ||
+                            u.Name.ToLower().Contains(searchText) ||
+                            u.Surname.ToLower().Contains(searchText))
+                .ToListAsync();
+        }
+
         public async Task<int> Register(User user, string password)
         {
             _hashManager.CreateHash(password, out byte[] hash, out byte[] salt);
+
             user.Hash = hash;
             user.Salt = salt;
+
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
@@ -75,5 +93,17 @@ namespace Infrastructure.Repositories
             return await _dbContext.Follows
                 .FirstOrDefaultAsync(f => f.FollowerId == followerId && f.FollowingId == followingId);
         }
+
+        //public async Task<int> GetFollowerCount(int userId)
+        //{
+        //    return await _dbContext.Follows
+        //        .CountAsync(f => f.FollowingId == userId);
+        //}
+
+        //public async Task<int> GetFollowingCount(int userId)
+        //{
+        //    return await _dbContext.Follows
+        //        .CountAsync(f => f.FollowerId == userId);
+        //}
     }
 }

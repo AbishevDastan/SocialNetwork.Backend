@@ -3,6 +3,7 @@ using Application.AuthenticationHandlers.JwtManager;
 using Application.Extensions.UserContext;
 using Application.UseCases.Follow;
 using Application.UseCases.User;
+using AutoMapper;
 using Domain.Abstractions;
 using Domain.Entities;
 
@@ -14,13 +15,26 @@ namespace Application.Services.UserService
         private readonly IHashManager _hashManager;
         private readonly IJwtManager _jwtManager;
         private readonly IUserContextService _userContextService;
+        private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IHashManager hashManager, IJwtManager jwtManager, IUserContextService userContextService)
+        public UserService(IUserRepository userRepository, IHashManager hashManager, IJwtManager jwtManager, IUserContextService userContextService, IMapper mapper)
         {
             _userRepository = userRepository;
             _hashManager = hashManager;
             _jwtManager = jwtManager;
             _userContextService = userContextService;
+            _mapper = mapper;
+        }
+
+        public async Task<List<UserDto>> GetUsers()
+        {
+            var users = await _userRepository.GetUsers();
+
+            if(users == null)
+            {
+                throw new Exception("Users not found.");
+            }
+            return _mapper.Map<List<UserDto>>(users);
         }
 
         public async Task<int> Register(User user, string password)
@@ -82,6 +96,16 @@ namespace Application.Services.UserService
                 throw new Exception("You can not unfollow yourself.");
             }
             throw new Exception("You can not unfollow the user, who is not followed by you.");
+        }
+
+        public async Task<List<UserDto>> SearchUsers(string searchText)
+        {
+            var result = await _userRepository.SearchUsers(searchText);
+
+            if(result == null || result.Count <= 0)
+                throw new InvalidOperationException("Users not found.");
+
+            return _mapper.Map<List<UserDto>>(result);
         }
     }
 }

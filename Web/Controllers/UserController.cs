@@ -20,11 +20,30 @@ namespace Web.Controllers
             _userContextService = userContextService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<UserDto>>> GetUsers()
+        {
+            var users = await _userService.GetUsers();
+
+            if(users  == null || users.Count == 0)
+                return NotFound();
+
+            return Ok(users);
+        }
+
         [HttpPost]
         [Route("register")]
         public async Task<ActionResult<int>> Register(RegisterUserDto request)
         {
-            var response = await _userService.Register(new User { Email = request.Email }, request.Password);
+            var response = await _userService.Register(
+                new User 
+                { 
+                    Email = request.Email,
+                    Name = request.Name,
+                    Surname = request.Surname,
+                    CreationDate = DateTime.Now,
+                }, request.Password);
+
             return Ok(response);
         }
 
@@ -34,6 +53,17 @@ namespace Web.Controllers
         {
             var response = await _userService.Login(request.Email, request.Password);
             return Ok(response);
+        }
+
+        [HttpGet("{searchText}/search")]
+        public async Task<ActionResult<List<UserDto>>> SearchUsers(string searchText)
+        {
+            var result = await _userService.SearchUsers(searchText);
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
         }
 
         [HttpPost("{followingId}/follow")]

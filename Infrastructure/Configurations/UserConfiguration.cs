@@ -12,6 +12,8 @@ namespace Infrastructure.Configurations
             builder.Property(x => x.Id).IsRequired().ValueGeneratedOnAdd();
 
             builder.Property(x => x.Email);
+            builder.Property(x => x.Name);
+            builder.Property(x => x.Surname);
             builder.Property(x => x.Hash);
             builder.Property(x => x.Salt);
             builder.Property(x => x.Role);
