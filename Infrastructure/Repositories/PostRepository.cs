@@ -51,6 +51,13 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Post>> GetPostsByUserId(int userId)
+        {
+            return await _dbContext.Posts
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<Post> UpdatePost(Post post, int id)
         {
             var dbPost = await GetPost(id);

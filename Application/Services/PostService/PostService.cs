@@ -72,6 +72,16 @@ namespace Application.Services.PostService
             return _mapper.Map<List<PostDto>>(posts);
         }
 
+        public async Task<List<PostDto>> GetPostsByUserId(int userId)
+        {
+            var posts = await _postRepository.GetPostsByUserId(userId);
+
+            if (posts == null || posts.Count <= 0)
+                throw new Exception("Posts not found");
+
+            return _mapper.Map<List<PostDto>>(posts);
+        }
+
         public async Task<PostDto> UpdatePost(UpdatePostDto updatePostDto, int id)
         {
             var post = await _postRepository.GetPost(id);

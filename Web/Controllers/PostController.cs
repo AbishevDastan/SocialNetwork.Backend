@@ -30,12 +30,23 @@ namespace Web.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
-            var employee = await _postService.GetPost(id);
+            var post = await _postService.GetPost(id);
 
-            if (employee == null)
+            if (post == null)
                 return NotFound();
 
-            return Ok(employee);
+            return Ok(post);
+        }
+
+        [HttpGet("{userId}/posts-by-user-id")]
+        public async Task<ActionResult<List<PostDto>>> GetPostsByUserId(int userId)
+        {
+            var posts = await _postService.GetPostsByUserId(userId);
+
+            if (posts == null)
+                return NotFound();
+
+            return Ok(posts);
         }
 
         //[HttpGet("{searchText}/search")]
