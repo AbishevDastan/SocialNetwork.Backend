@@ -28,6 +28,9 @@ namespace Application.Extensions
             CreateMap<PostDto, UpdatePostDto>();
             CreateMap<UpdatePostDto, PostDto>();
 
+            CreateMap<PostReaction, PostReactionDto>();
+            CreateMap<PostReactionDto, PostReaction>();
+
             CreateMap<Follow, FollowDto>();
             CreateMap<FollowDto, Follow>();
         }

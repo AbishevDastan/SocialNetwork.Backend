@@ -1,5 +1,7 @@
-﻿using Application.Services.PostService;
+﻿using Application.Extensions.UserContext;
+using Application.Services.PostService;
 using Application.UseCases.Post;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +12,13 @@ namespace Web.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IUserContextService _userContextService;
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService,
+            IUserContextService userContextService)
         {
             _postService = postService;
+            _userContextService = userContextService;
         }
 
         [HttpGet("posts")]
@@ -95,6 +100,24 @@ namespace Web.Controllers
                 return NotFound();
 
             return Ok(result);
+        }
+
+        [HttpPost("{postId}/react")]
+        [Authorize]
+        public async Task<ActionResult> AddPostReaction(int postId, [FromBody] PostReactions reactionType)
+        {
+            await _postService.AddPostReaction(postId, reactionType, _userContextService.GetCurrentUserId());
+
+            return Ok("Reaction added successfully");
+        }
+
+        [HttpGet("{postId}/reactions")]
+        [Authorize]
+        public async Task<ActionResult> GetPostReactionsByPostId(int postId)
+        {
+            var reactions = await _postService.GetPostReactionsByPostId(postId);
+
+            return Ok(reactions);
         }
     }
 }

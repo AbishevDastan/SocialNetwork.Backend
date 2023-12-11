@@ -3,6 +3,7 @@ using Application.UseCases.Post;
 using AutoMapper;
 using Domain.Abstractions;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Services.PostService
 {
@@ -99,6 +100,36 @@ namespace Application.Services.PostService
                 return _mapper.Map<PostDto>(updatedPost);
             }
             throw new Exception("Access denied. You must be the author to edit a post.");
+        }
+
+        public async Task AddPostReaction(int postId, PostReactions reactionType, int userId)
+        {
+            var postReactions = await _postRepository.GetPostReactionsByPostId(postId);
+            if (postReactions == null)
+            {
+                throw new Exception($"Post with ID {postId} not found");
+            }
+
+            var existingReaction = postReactions.FirstOrDefault(r => r.UserId == userId);
+            if (existingReaction != null)
+            {
+                throw new Exception("User has already reacted to this post");
+            }
+
+            await _postRepository.AddPostReaction(postId, reactionType, userId);
+        }
+
+        public async Task<List<PostReactionDto>> GetPostReactionsByPostId(int postId)
+        {
+            var post = await GetPost(postId);
+            if (post == null)
+            {
+                throw new Exception($"Post with ID {postId} not found");
+            }
+
+            var reactions = await _postRepository.GetPostReactionsByPostId(postId);
+
+            return _mapper.Map<List<PostReactionDto>>(reactions);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Application.UseCases.Post
+﻿using Domain.Enums;
+
+namespace Application.UseCases.Post
 {
     public class PostDto
     {
@@ -6,5 +8,6 @@
         public string Content { get; set; } = string.Empty;
         public DateTimeOffset CreationDate { get; set; }
         public int UserId { get; set; }
+        public List<PostReactionDto> PostReactions { get; set; } = new List<PostReactionDto>();
     }
 }

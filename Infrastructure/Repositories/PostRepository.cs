@@ -1,5 +1,6 @@
 ﻿using Domain.Abstractions;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
@@ -72,6 +73,33 @@ namespace Infrastructure.Repositories
                 return dbPost;
             }
             throw new ArgumentNullException(nameof(post));
+        }
+
+        public async Task AddPostReaction(int postId, PostReactions reactionType, int userId)
+        {
+            var reaction = new PostReaction
+            {
+                ReactionType = reactionType,
+                UserId = userId
+            };
+
+            var post = await _dbContext.Posts
+                .Include(p => p.PostReactions)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post != null)
+            {
+                post.PostReactions.Add(reaction);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+        public async Task<List<PostReaction>> GetPostReactionsByPostId(int postId)
+        {
+            var post = await _dbContext.Posts
+                .Include(p => p.PostReactions)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+
+            return post?.PostReactions;
         }
     }
 }
